@@ -1,0 +1,2 @@
+python manage.py create_encodings : this command is used to generate encodings of images of Faces dir
+python manage.py runserver : is used to run apis
