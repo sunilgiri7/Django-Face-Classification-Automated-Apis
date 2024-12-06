@@ -75,7 +75,7 @@ It Automatically Opens OpenCV Camera and start predicting face if its encodings 
 
 1. **Clone the Repository:**
    ```bash
-   git clone [https://github.com/yourusername/facial-recognition-system.git](https://github.com/sunilgiri7/Django-Face-Classification-Automated-Apis.git)
+   git clone https://github.com/sunilgiri7/Django-Face-Classification-Automated-Apis.git
    cd facial-recognition-system
    ```
 
