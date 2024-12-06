@@ -37,16 +37,16 @@ def log_attendance(name):
     # Reset temporary attendance if a new day starts
     if current_time >= reset_time:
         temporary_attendance.clear()
-        reset_time = current_time + timedelta(days=1)
+        reset_time = datetime.combine(current_date + timedelta(days=1), datetime.min.time())
 
-    # Check if the person already has an entry for today
+    # Ensure the person has an entry in temporary attendance
     if name not in temporary_attendance:
         temporary_attendance[name] = {"IN": None, "OUT": None}
 
     # Load existing data
     df = pd.read_excel(attendance_file)
 
-    # Get today's record for the person
+    # Today's record for the person
     person_today = df[(df["Name"] == name) & (df["Date"] == current_date)]
 
     # Mark "IN" or "OUT"
@@ -61,17 +61,19 @@ def log_attendance(name):
                 "Date": current_date,
             }
             df = pd.concat([df, pd.DataFrame([new_entry])], ignore_index=True)
+            df.to_excel(attendance_file, index=False)
             print(f"IN entry logged for {name} at {current_time.strftime('%H:%M:%S')}")
+            return "IN"
     elif temporary_attendance[name]["OUT"] is None and not person_today.empty:
         # Second entry (OUT time)
-        temporary_attendance[name]["OUT"] = current_time
         idx = person_today.index[0]
         if pd.isna(df.loc[idx, "OUT_Time"]):  # Ensure no duplicate OUT entry
+            temporary_attendance[name]["OUT"] = current_time
             df.loc[idx, "OUT_Time"] = current_time.strftime("%H:%M:%S")
+            df.to_excel(attendance_file, index=False)
             print(f"OUT entry logged for {name} at {current_time.strftime('%H:%M:%S')}")
-
-    # Save updated data
-    df.to_excel(attendance_file, index=False)
+            return "OUT"
+    return None  # No marking was done
 
 
 class FacialRecognitionAPI(APIView):
@@ -145,7 +147,7 @@ class FacialRecognitionAPI(APIView):
                 cv2.putText(frame, name, pt_1, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1)
             else:
                 # Log attendance and get mark type (IN or OUT)
-                mark_type = self.update_attendance_and_get_mark_type(name)
+                mark_type = log_attendance(name)
 
                 # Draw bounding box and label for recognized faces
                 cv2.rectangle(frame, pt_1, pt_2, (0, 255, 0), 2)
