@@ -50,9 +50,7 @@ This project is a Django-based facial recognition system that uses advanced deep
 
 **Request Format:**
 ```json
-{
-    "image": "image.jpg"
-}
+It Automatically Opens OpenCV Camera and start predicting face if its encodings are generated and saved in DB otherwise it shows person as Unknown
 ```
 
 **Response Examples:**
@@ -66,8 +64,11 @@ This project is a Django-based facial recognition system that uses advanced deep
 - No Match:
   ```json
   {
-      "message": "No match found for the provided image"
+      "message": "Unknown"
   }
+  ```
+  ```json
+  These messages are shown below bounding box of captured face
   ```
 
 ## Installation and Setup
